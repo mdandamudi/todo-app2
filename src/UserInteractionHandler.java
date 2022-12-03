@@ -3,22 +3,37 @@ import java.util.List;
 import java.util.Scanner;
 
 public class UserInteractionHandler {
-    public static final String ADD = "Add";
-    public static final String DELETE = "Delete";
-    public static final String DONE = "Mark Done";
-    public static final String EDIT = "Edit";
-    public static final String QUIT = "Quit";
-    public static final String PRINT = "Print";
-    public ToDo toDo;
+    private static final String ADD = "Add";
+    private static final String DELETE = "Delete";
+    private static final String DONE = "Mark Done";
+    private static final String EDIT = "Edit";
+    private static final String QUIT = "Quit";
+    private static final String PRINT = "Print";
+
+    public enum Action {
+        ADD,
+        DELETE,
+        DONE,
+        EDIT,
+        QUIT
+    }
 
     public void start() {
-        toDo = new ToDo();
-        List<String> listOfActions = new ArrayList<>();
-        listOfActions.add(ADD);
-        listOfActions.add(DELETE);
-        listOfActions.add(DONE);
-        listOfActions.add(EDIT);
-        listOfActions.add(QUIT);
+        ToDo toDo = new ToDo();
+        UserActionProcessor userActionProcessor = new UserActionProcessor();
+        List<String> listOfActions = List.of(
+                ADD,
+                DELETE,
+                DONE,
+                EDIT,
+                QUIT
+        );
+//        new ArrayList<>();
+//        listOfActions.add(ADD);
+//        listOfActions.add(DELETE);
+//        listOfActions.add(DONE);
+//        listOfActions.add(EDIT);
+//        listOfActions.add(QUIT);
 
         System.out.println("Application started");
         for (String action : listOfActions) {
@@ -28,32 +43,32 @@ public class UserInteractionHandler {
         List<ToDoItem> todos = new ArrayList<>(); // polymorphism
         String value;
 
+//        var blah = "hi";
+
         while (true) {
             System.out.println("Choose any action(Add,Edit,Delete,Mark Done,Print,Quit):");
             value = getInputFromUser();
             if (value.equalsIgnoreCase(ADD)) {
                 System.out.println("Enter an errand to add:");
-                String errand = getInputFromUser();
-                toDo.add(todos, errand);
-                toDo.print(todos);
+                userActionProcessor.processAddTodo(toDo, todos);
             } else if (value.equalsIgnoreCase(DELETE)) {
                 System.out.println("Enter an index to delete:");
-                int index= getIndexFromUser();
-                if(index >= 0) {
+                int index = getIndexFromUser();
+                if (index >= 0) {
                     toDo.delete(todos, index);
                     toDo.print(todos);
                 }
             } else if (value.equalsIgnoreCase(DONE)) {
                 System.out.println("Enter an index to update:");
                 int index = getIndexFromUser();
-                if(index >= 0) {
+                if (index >= 0) {
                     toDo.markDone(todos, index);
                     toDo.print(todos);
-                }
+                } // TODO - notify user if bad index (<0)
             } else if (value.equalsIgnoreCase(EDIT)) {
                 System.out.println("Enter an index to update:");
                 int index = getIndexFromUser();
-                if(index >= 0) {
+                if (index >= 0) {
                     System.out.println("Enter an errand to replace with:");
                     String updatedAction = getInputFromUser();
                     toDo.edit(todos, index, updatedAction);
@@ -69,19 +84,23 @@ public class UserInteractionHandler {
         }
     }
 
-    public int getIndexFromUser() {
+
+
+    private int getIndexFromUser() {
         Scanner scanner = new Scanner(System.in);
-        int index = 0;
+        int index;
+
         try {
             index = Integer.parseInt(scanner.nextLine());
         } catch (NumberFormatException e) {
             System.out.println("Input is not a valid number.");
             return -1;
         }
+
         return index;
     }
 
-    public String getInputFromUser() {
+    private String getInputFromUser() {
         Scanner scanner = new Scanner(System.in);
         return scanner.nextLine();
     }
